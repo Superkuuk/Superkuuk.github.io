@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pomodroppo</title>
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="child">
+      <div class="error"></div>
+      <div id="timer">00:00:00:000</div>
+      <div class="buttons">
+        <div class="startTimer button" onclick="startTimer()">Start</div>
+        <div class="resetTimer reset button" onclick="resetTimer()">Stop</div>
+      </div>
+      <div class="buttons">
+        <div class="set20 button" onclick="setPomodoro(20)">20m</div>
+        <div class="set5 button" onclick="setPomodoro(5)">5m</div>
+      </div>
+      <div id="notify" class="switchContainer">
+        <span>Notificatie:</span>
+          <label class="switch">
+            <input type="checkbox" id="notification">
+            <span class="slider round"></span>
+          </label>
+      </div>
+      <div id="alarmContainer" class="switchContainer">
+        <span>Geluid:</span>
+          <label class="switch">
+            <input type="checkbox" id="alarm">
+            <span class="slider round"></span>
+          </label>
+      </div>
+      <div id="flashContainer" class="switchContainer">
+        <span>Flits:</span>
+          <label class="switch">
+            <input type="checkbox" id="flash">
+            <span class="slider round"></span>
+          </label>
+      </div>
+    </div>
+  </div>
+
+  <div id="progressbar"></div>
+
+<script src="index.js"></script>
+</body>
+</html>
