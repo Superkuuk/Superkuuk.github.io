@@ -2,16 +2,64 @@
 <html>
 <head>
 <title>Pecorella</title>
+ 
+ <style>
+  body {
+  background: rgb(2,0,36);
+background: linear-gradient(351deg, rgba(2,0,36,1) 0%, rgba(20,20,38,1) 52%, rgba(9,18,82,1) 100%);
+}
+
+.story {
+ margin:auto;width:50%;max-width:400px;color:white;padding:100px;font-size:1.2em;
+  }
+  
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255,255,255,0.0);
+  border-radius: 5px;
+}
+
+@keyframes twinkle {
+  0% {
+    transform: scale(1, 1);
+    background: rgba(255,255,255,0.0);
+    animation-timing-function: ease-in;
+  }
+  60% {
+    transform: scale(0.8, 0.8);
+    background: rgba(255,255,255,1);
+    animation-timing-function: ease-out;
+  }
+  80% {
+    background: rgba(255,255,255,0.00);
+    transform: scale(1, 1);
+  }
+  100% {
+    background: rgba(255,255,255,0.0);
+    transform: scale(1, 1);
+  }
+}
+
+ </style>
 
 </head>
-<body style="background:#433f5e">
+<body>
 
- <div style="margin:auto;width:50%;max-width:400px;color:white;padding:100px;font-size:1.2em">
+ <div class="story">
   <p>A little lamb once jumped the fence to go on a great adventure. All he brought were dreams and some wool so he could be warm during the cold nights.</p>
   <p>This particular night it was very cold, since the sky showed all her stars. There was no warm cover of fluffy clouds to keep the lamb warm. But for this reason he had brought his wool.</p>
   <p>The nightsky, filled with tiny dots of white, was a beautiful sight! And the lamb trotted satisfied over the small dirt road leading towards the full moon.</p>
   <p>After a long walk, exhausted from staring at the stars, the little lamb sat down to get some rest. It was short after that he met a wonderful creature.</p>
  </div>
     
+ 
+ <script>
+  for (var i = 0; i < 100; i++) {
+  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*$(window).height()+'px; left: '+Math.random()*$(window).width()+'px;"></div>';
+  $('body').append(star);
+}
+ </script>
 </body>
 </html>
