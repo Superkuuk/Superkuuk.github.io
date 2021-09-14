@@ -49,7 +49,6 @@ background-image: linear-gradient(169deg, rgba(4,2,47,1) 0%, rgba(60,25,59,1) 62
   <script>
   for (var i = 0; i < 100; i++) {
   var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*window.innerHeight+'px; left: '+Math.random()*window.innerWidth+'px;"></div>';
-  $('body').append(star);
   document.body.insertAdjacentHTML( 'beforeend', star );
 }
  </script>
