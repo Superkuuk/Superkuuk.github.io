@@ -63,14 +63,14 @@
   <p>After a long walk, exhausted from staring at the stars, the little lamb sat down to get some rest. It was short after that he met a wonderful creature.</p>
  </div>
  
- <div id="starCollection></div>
+<div id="starCollection></div>
     
-   <script>
+<script>
   for (var i = 0; i < 100; i++) {
   var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*(window.innerHeight-10)+'px; left: '+Math.random()*(window.innerWidth-10)+'px;"></div>';
   document.getElementById('starCollection').insertAdjacentHTML( 'beforeend', star );
 }
- </script>
+</script>
 
 </body>
 </html>
