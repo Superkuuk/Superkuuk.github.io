@@ -4,16 +4,14 @@
 <title>Pecorella</title>
  
  <style>
-  body {
-
-}
-  
   html { 
   background: linear-gradient(169deg, rgba(4,2,47,1) 0%, rgba(60,25,59,1) 62%, rgba(9,16,65,1) 100%) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+   margin: 0;
+   padding: 0;
 }
 
 .story {
@@ -64,7 +62,7 @@
     
    <script>
   for (var i = 0; i < 100; i++) {
-  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*window.innerHeight+'px; left: '+Math.random()*window.innerWidth+'px;"></div>';
+  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*(window.innerHeight-10)+'px; left: '+Math.random()*(window.innerWidth-10)+'px;"></div>';
   document.body.insertAdjacentHTML( 'beforeend', star );
 }
  </script>
