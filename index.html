@@ -9,6 +9,8 @@ background: rgb(4,2,47);
 background: linear-gradient(169deg, rgba(4,2,47,1) 0%, rgba(60,25,59,1) 62%, rgba(9,16,65,1) 100%);
    background-size: cover;
    background-repeat: no-repeat;
+   height: 100vh;
+   width: 100vw;
 }
 
 .story {
@@ -48,8 +50,9 @@ background: linear-gradient(169deg, rgba(4,2,47,1) 0%, rgba(60,25,59,1) 62%, rgb
  
   <script>
   for (var i = 0; i < 100; i++) {
-  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*$(window).height()+'px; left: '+Math.random()*$(window).width()+'px;"></div>';
+  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*window.innerHeight+'px; left: '+Math.random()*window.innerWidth+'px;"></div>';
   $('body').append(star);
+  document.body.insertAdjacentHTML( 'beforeend', star );
 }
  </script>
 
