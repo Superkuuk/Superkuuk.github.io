@@ -13,6 +13,9 @@
    margin: 0;
    padding: 0;
 }
+  #starCollection {
+   overflow:hidden;
+  }
 
 .story {
  margin:auto;width:50%;max-width:400px;color:white;padding:100px;font-size:1.2em;
@@ -59,11 +62,13 @@
   <p>The nightsky, filled with tiny dots of white, was a beautiful sight! And the lamb trotted satisfied over the small dirt road leading towards the full moon.</p>
   <p>After a long walk, exhausted from staring at the stars, the little lamb sat down to get some rest. It was short after that he met a wonderful creature.</p>
  </div>
+ 
+ <div id="starCollection></div>
     
    <script>
   for (var i = 0; i < 100; i++) {
   var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*(window.innerHeight-10)+'px; left: '+Math.random()*(window.innerWidth-10)+'px;"></div>';
-  document.body.insertAdjacentHTML( 'beforeend', star );
+  document.getElementById('starCollection').insertAdjacentHTML( 'beforeend', star );
 }
  </script>
 
