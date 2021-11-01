@@ -9,10 +9,13 @@ const file = 'FaultyObj_3dm.3dm'
 rhino3dm().then(async m => {
     console.log('Loaded rhino3dm.')
     let rhino = m
-
+    console.log('1')
     let res = await fetch(file)
+    console.log('2')
     let buffer = await res.arrayBuffer()
+    console.log('3')
     let arr = new Uint8Array(buffer)
+    console.log('4')
     let doc = rhino.File3dm.fromByteArray(arr)
     
     console.log('read file.')
