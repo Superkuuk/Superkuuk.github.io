@@ -14,6 +14,8 @@ rhino3dm().then(async m => {
     let buffer = await res.arrayBuffer()
     let arr = new Uint8Array(buffer)
     let doc = rhino.File3dm.fromByteArray(arr)
+    
+    console.log('read file.')
 
     init()
 
@@ -28,6 +30,7 @@ rhino3dm().then(async m => {
             scene.add(threeMesh)
         }
     }
+    console.log('added objects to scene')
 })
 
 // BOILERPLATE //
@@ -51,6 +54,7 @@ function init(){
 
     window.addEventListener( 'resize', onWindowResize, false )
     animate()
+    console.log('finished init()')
 }
 
 function animate () {
@@ -68,5 +72,6 @@ function onWindowResize() {
 function meshToThreejs(mesh, material) {
     const loader = new THREE.BufferGeometryLoader()
     const geometry = loader.parse(mesh.toThreejsJSON())
+    console.log('mesh to threejs')
     return new THREE.Mesh(geometry, material)
 }
