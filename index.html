@@ -1,87 +1,1091 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="nl">
 <head>
-<title>Pecorella</title>
- 
- <style>
-  html { 
-  background: linear-gradient(169deg, rgba(4,2,47,1) 0%, rgba(60,25,59,1) 62%, rgba(9,16,65,1) 100%) no-repeat center center fixed; 
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-   margin: 0;
-   padding: 0;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>pecorella · chronografie</title>
+<meta name="description" content="Een chronografische plaat: een vierdimensionaal object dat door de tijd daalt, belicht op een vreemde attractor.">
+<meta name="theme-color" content="#0d0906">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0906'/%3E%3Cpath d='M5 7h5.5v5h5v5h5v5H26' fill='none' stroke='%23c9923f' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M3 10h5.5v5h5v5h5v5' fill='none' stroke='%239a4f2c' stroke-width='1' opacity='.7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0906;
+  --ink:#ecdcc0;
+  --muted:#a8916f;
+  --faint:#76644d;
+  --ochre:#c9923f;
+  --ochre-a:201,146,63;
+  --sienna-a:154,79,44;
+  --verdigris-a:111,143,136;
+  --serif:'Cormorant Garamond','Cormorant',Garamond,'Iowan Old Style','Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --gut:clamp(16px,3.6vw,56px);
+  --glow:0 0 22px rgba(8,5,3,.95),0 0 4px rgba(8,5,3,.8);
 }
-  #starCollection {
-   overflow:hidden;
-   width: 100vw;
-height: 100vh;
-position: fixed;
-top: 0;
-left: 0;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
+body{font-family:var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body.idle{cursor:none}
 
-.story {
- margin:auto;width:50%;max-width:400px;color:white;padding:100px;font-size:1.2em;
-  }
-  
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(255,255,255,0.0);
-  border-radius: 5px;
+#exposure,#chrono{position:fixed;inset:0;width:100%;height:100%;display:block}
+#chrono{mix-blend-mode:screen}
+
+.vignette{position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(130% 95% at 62% 48%,transparent 38%,rgba(6,4,3,.5) 72%,rgba(4,2,1,.92) 100%);}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;opacity:.075;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{
+  0%{transform:translate(0,0)}17%{transform:translate(-3%,2%)}33%{transform:translate(2%,-4%)}
+  50%{transform:translate(-4%,-1%)}67%{transform:translate(3%,3%)}83%{transform:translate(-1%,4%)}100%{transform:translate(0,0)}}
+
+/* ---------- interface ---------- */
+.ui{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto;row-gap:clamp(.8rem,2vh,1.6rem);column-gap:2rem;
+  padding:max(var(--gut),env(safe-area-inset-top)) max(var(--gut),env(safe-area-inset-right)) max(calc(var(--gut)*.55),env(safe-area-inset-bottom)) max(var(--gut),env(safe-area-inset-left));
+  pointer-events:none;text-shadow:var(--glow)}
+.ui a{pointer-events:auto}
+.top,.stairs{transition:opacity 4s ease}
+body.idle .top,body.idle .stairs{opacity:.2}
+body.idle .strip figcaption{opacity:.25}
+
+.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem}
+.brand h1{position:relative;display:inline-block;font-weight:300;font-style:italic;font-size:clamp(1.55rem,2.3vw,2.1rem);letter-spacing:.01em;line-height:1}
+.brand h1::before,.brand h1::after{content:attr(data-text);position:absolute;left:0;top:0;pointer-events:none;text-shadow:none}
+.brand h1::before{color:rgba(var(--ochre-a),.32);animation:ghostA 11s ease-in-out infinite}
+.brand h1::after{color:rgba(var(--sienna-a),.22);animation:ghostB 11s ease-in-out infinite}
+@keyframes ghostA{0%,100%{transform:translate(-.1em,-.07em)}50%{transform:translate(-.26em,-.16em)}}
+@keyframes ghostB{0%,100%{transform:translate(-.2em,-.14em)}50%{transform:translate(-.52em,-.32em)}}
+.gloss{margin-top:.55rem;font-size:.92rem;color:var(--muted);letter-spacing:.01em}
+.gloss i{color:var(--ink)}
+
+.ledger{font-family:var(--mono);font-weight:300;font-size:.64rem;letter-spacing:.05em;color:var(--faint);
+  display:grid;grid-template-columns:auto auto;column-gap:1.1rem;row-gap:.2rem;text-align:right;white-space:nowrap}
+.ledger dt{text-transform:uppercase;letter-spacing:.14em;font-size:.56rem;align-self:center}
+.ledger dd{color:var(--muted);font-variant-numeric:tabular-nums}
+.ledger a{color:var(--ochre);text-decoration:none;border-bottom:1px dotted rgba(var(--ochre-a),.4)}
+.ledger a:hover,.ledger a:focus-visible{color:var(--ink);outline:none}
+.ledger .hint{grid-column:1/-1;margin-top:.45rem;font-size:.56rem;letter-spacing:.12em;color:rgba(118,100,77,.75);text-transform:lowercase}
+
+/* the staircase */
+.stairs{--gap:clamp(.35rem,1.7vh,1.25rem);grid-column:1;align-self:center;justify-self:start;display:flex;flex-direction:column;gap:var(--gap);padding-left:.9rem}
+.step{--off:calc(var(--i) * clamp(1.05rem,3.4vw,4rem));
+  position:relative;margin-left:var(--off);display:grid;grid-template-columns:1.6rem auto;align-items:baseline;
+  color:inherit;text-decoration:none;padding:.1rem 2.2rem .5rem 0;outline:none;width:max-content;max-width:calc(100vw - var(--off) - 2*var(--gut))}
+.step .no{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:var(--ochre);opacity:.75;transform:translateY(-.4em)}
+.step .word{font-weight:300;font-size:clamp(1.8rem,min(4.3vw,5.4vh),3.5rem);line-height:1;letter-spacing:-.005em;
+  text-shadow:var(--glow),0 0 0 rgba(var(--ochre-a),0),0 0 0 rgba(var(--sienna-a),0),0 0 0 rgba(var(--sienna-a),0),0 0 0 rgba(var(--verdigris-a),0),0 0 0 rgba(var(--verdigris-a),0);
+  transition:text-shadow 1.1s cubic-bezier(.2,.7,.1,1),transform 1.1s cubic-bezier(.2,.7,.1,1),color .6s}
+.step .meta{grid-column:2;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.8rem;row-gap:.1rem;margin-top:.3rem}
+.step .ety{font-size:.98rem;color:var(--muted)}
+.step .ety i{color:#cdb894}
+.step .host{font-family:var(--mono);font-size:.6rem;letter-spacing:.07em;color:var(--faint);opacity:0;transform:translateX(-.5rem);transition:opacity .8s,transform .8s}
+.step::after{content:'';position:absolute;left:-.9rem;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,rgba(var(--ochre-a),.6),rgba(var(--ochre-a),.18) 60%,transparent);
+  transform-origin:left;transform:scaleX(.42);transition:transform 1.3s cubic-bezier(.2,.7,.1,1),opacity 1.3s;opacity:.75}
+.step::before{content:'';position:absolute;left:-.9rem;bottom:0;width:1px;height:calc(100% + var(--gap));
+  background:linear-gradient(0deg,rgba(var(--ochre-a),.5),transparent)}
+.step:first-child::before{height:100%}
+.step:hover .word,.step:focus-visible .word{transform:translateX(.4rem);color:#fff4df;
+  text-shadow:var(--glow),
+   -.16em -.09em 0 rgba(var(--ochre-a),.34),
+   -.32em -.18em 0 rgba(var(--sienna-a),.24),
+   -.48em -.27em 0 rgba(var(--sienna-a),.15),
+   -.64em -.36em 0 rgba(var(--verdigris-a),.09),
+   -.8em -.45em 0 rgba(var(--verdigris-a),.05)}
+.step:hover .host,.step:focus-visible .host{opacity:1;transform:none}
+.step:hover::after,.step:focus-visible::after{transform:scaleX(1);opacity:1}
+
+/* weetje */
+.weetje{grid-column:2;grid-row:2;align-self:end;justify-self:end;width:min(38ch,31vw);text-align:right}
+.weetje .bar{margin-left:auto}
+.weetje .cat{display:block;font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ochre);margin-bottom:.45rem}
+.weetje p{font-style:italic;font-size:clamp(1rem,1.22vw,1.15rem);line-height:1.4;color:#d9c7a6}
+.weetje p i{font-style:normal;color:#efdfbf}
+.weetje .cat,.weetje p{transition:opacity .9s ease,filter .9s ease,transform .9s ease}
+.weetje.hold .bar{opacity:0}
+.weetje .bar{transition:opacity .6s}
+.weetje.out .cat,.weetje.out p{opacity:0;filter:blur(6px);transform:translate(-.3rem,.15rem)}
+.weetje .bar{height:1px;margin-top:.8rem;width:7rem;background:linear-gradient(90deg,rgba(var(--ochre-a),.7),rgba(var(--ochre-a),.15));
+  transform-origin:left;animation:bar var(--dur,26s) linear forwards}
+@keyframes bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* slit-scan */
+.strip{grid-column:1/-1;position:relative;margin:0 calc(var(--gut) * -.35)}
+.strip canvas{display:block;width:100%;height:clamp(34px,5.4vh,54px);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 97%,transparent);
+  border-top:1px solid rgba(var(--ochre-a),.14);border-bottom:1px solid rgba(var(--ochre-a),.14)}
+.strip figcaption{display:flex;justify-content:space-between;gap:1rem;margin-top:.4rem;padding:0 calc(var(--gut) * .35);
+  font-family:var(--mono);font-weight:300;font-size:.56rem;letter-spacing:.14em;text-transform:lowercase;color:var(--faint);transition:opacity 4s}
+
+a:focus-visible{outline:none}
+
+@media (max-width:719px){
+  .ui{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto}
+  .weetje{grid-column:1;grid-row:3;justify-self:start;align-self:auto;width:auto;max-width:46ch;text-align:left}
+  .weetje .bar{margin-left:0}
+  .ledger{grid-template-columns:auto;row-gap:.15rem}
+  .ledger dt,.ledger .opt,.ledger .hint{display:none}
+  .gloss{font-size:.84rem}
+  .strip figcaption .long{display:none}
+  .stairs{align-self:end;justify-self:stretch;align-items:flex-start;padding-bottom:.4rem}
+  .step{width:auto;max-width:calc(100% - var(--off));grid-template-columns:1.4rem minmax(0,1fr);padding-right:.6rem}
+  .step .host{display:none}
+  .step .ety{font-size:.9rem}
 }
-
-@keyframes twinkle {
-  0% {
-    transform: scale(1, 1);
-    background: rgba(255,255,255,0.0);
-    animation-timing-function: ease-in;
-  }
-  60% {
-    transform: scale(0.8, 0.8);
-    background: rgba(255,255,255,1);
-    animation-timing-function: ease-out;
-  }
-  80% {
-    background: rgba(255,255,255,0.00);
-    transform: scale(1, 1);
-  }
-  100% {
-    background: rgba(255,255,255,0.0);
-    transform: scale(1, 1);
-  }
+@media (max-width:719px) and (max-height:700px){
+  .weetje{display:none}
 }
-
- </style>
-
-
+@media (max-height:700px) and (min-width:720px){
+  .ledger .opt.x{display:none}
+}
+@media (max-height:520px){
+  .weetje,.strip figcaption{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .grain,.brand h1::before,.brand h1::after{animation:none}
+}
+</style>
 </head>
 <body>
+<canvas id="exposure" aria-hidden="true"></canvas>
+<canvas id="chrono" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
- <div class="story">
-  <p>A small sheep once jumped the fence to go on a great adventure. All she brought were dreams and some wool so she could be warm during the cold nights.</p>
-  <p>On this particular night the air was very cold, since the sky showed all her stars. There was no warm cover of fluffy clouds to keep the sheep warm. But for this reason she had brought her wool.</p>
-  <p>The nightsky, filled with tiny dots of white, was a beautiful sight! And the sheep trotted satisfied over the small dirt road leading towards the full moon.</p>
-  <p>After a long walk, exhausted from staring at the stars, the small sheep sat down to get some rest. It didn't take long before she noticed a peculiar sound.</p>
-  <p>This was no ordinary sound, it was magical, it tickled the sheep's ears. She started searching enthousiastic for the origin of the sweet sound she had heard.</p>
-  <p>It wasn't for long until the sheep saw a wonderful creature. It was a lot bigger than the white sparkles in the sky.</p>
-  <p>Coming forth from the tall grass, a creature stept in a beam of moonlight, only to be lit for a second before stepping out of it again. It was at that moment that the sheep saw that the creature was completely pink!</p>
-  <p>The small sheep had never seen a pink creature before, but the happy sounds it made, made the sheep love him immediately.</p>
-  <p>They stared at each other on the dark, star lit road. The pink creature's eyes sparkled. Of course, the sheep, as friendly as she is, took a few of her dreams she had brought.</p>
-  <p>The sparkling eyes looked to the dreams the sheep had offered and accepted a rather comfortable one. Nothing is better than to share your dreams with someone.</p>
- </div>
- 
-<div id="starCollection"></div>
-    
+<main class="ui">
+  <header class="top">
+    <div class="brand">
+      <h1 data-text="pecorella">pecorella</h1>
+      <p class="gloss">it. <i>‘schaapje’</i> ← lat. <i>pecus</i>, vee — zie ook <i>pecunia</i></p>
+    </div>
+    <dl class="ledger" aria-label="Belichtingsgegevens">
+      <dt>plaat</dt><dd><a id="plate" href="?" title="Deze plaat bewaren">№ ——</a></dd>
+      <dt>belichting</dt><dd id="l-exp">00:00:00</dd>
+      <dt class="opt">aarde ↻ zon</dt><dd class="opt" id="l-sun">0 km</dd>
+      <dt class="opt x">nl ↻ aardas</dt><dd class="opt x" id="l-rot">0 km</dd>
+      <dt class="opt">decimale tijd</dt><dd class="opt" id="l-dec">—</dd>
+      <dt class="opt">object</dt><dd class="opt" id="l-obj">—</dd>
+      <dt class="opt x">attractor</dt><dd class="opt x" id="l-att">—</dd>
+      <dd class="hint"><a id="newplate" href="?">nieuwe plaat</a> · klik: vang een moment · f: fullscreen</dd>
+    </dl>
+  </header>
+
+  <nav class="stairs" aria-label="Projecten">
+    <a class="step" style="--i:0" data-key="recepten" href="https://recepten.pecorella.nl">
+      <span class="no">I</span><span class="word">Recepten</span>
+      <span class="meta"><span class="ety">lat. <i>recipe</i>, ‘neem!’ — het bevel boven elk voorschrift, ℞</span><span class="host">recepten.pecorella.nl</span></span>
+    </a>
+    <a class="step" style="--i:1" data-key="fotos" href="https://fotos.pecorella.nl">
+      <span class="no">II</span><span class="word">Foto’s</span>
+      <span class="meta"><span class="ety">gr. <i>phōs</i> ‘licht’ + <i>graphein</i> ‘krassen, schrijven’</span><span class="host">fotos.pecorella.nl</span></span>
+    </a>
+    <a class="step" style="--i:2" data-key="nas" href="https://nas.pecorella.nl">
+      <span class="no">III</span><span class="word">NAS</span>
+      <span class="meta"><span class="ety">een <i>net</i>, een <i>staak</i>, een <i>voorraad</i> — network attached storage</span><span class="host">nas.pecorella.nl</span></span>
+    </a>
+    <a class="step" style="--i:3" data-key="thuis" href="https://thuis.pecorella.nl">
+      <span class="no">IV</span><span class="word">Thuis</span>
+      <span class="meta"><span class="ety">‘te huis’ ← germ. <i>*hūsą</i> · home assistant</span><span class="host">thuis.pecorella.nl</span></span>
+    </a>
+    <a class="step" style="--i:4" data-key="pomodroppo" href="https://pomodroppo.pecorella.nl">
+      <span class="no">V</span><span class="word">Pomodroppo</span>
+      <span class="meta"><span class="ety">it. <i>pomodoro</i> ‘gouden appel’ + <i>drop</i> ‘druppel’</span><span class="host">pomodroppo.pecorella.nl</span></span>
+    </a>
+  </nav>
+
+  <section class="weetje" id="weetje" aria-live="polite">
+    <span class="cat" id="w-cat">&nbsp;</span>
+    <p id="w-text">&nbsp;</p>
+    <div class="bar" id="w-bar"></div>
+  </section>
+
+  <figure class="strip">
+    <canvas id="slit" aria-hidden="true"></canvas>
+    <figcaption><span>spleetscan<span class="long"> — één verticale lijn door het object, uitgerold in de tijd</span></span><span id="slit-span">← — s · nu</span></figcaption>
+  </figure>
+</main>
+
 <script>
-  for (var i = 0; i < 100; i++) {
-  var star = '<div class="star" style="animation: twinkle '+((Math.random()*5) + 5)+'s linear '+((Math.random()*5) + 5)+'s infinite; top: '+Math.random()*(window.innerHeight-10)+'px; left: '+Math.random()*(window.innerWidth-10)+'px;"></div>';
-  document.getElementById('starCollection').insertAdjacentHTML( 'beforeend', star );
-}
-</script>
+(() => {
+'use strict';
 
+/* ================================================================
+   pecorella · chronografie
+   Een vierdimensionaal lichaam daalt door de tijd (à la Marey en
+   Duchamp), terwijl een Clifford-attractor als lange sluitertijd
+   op de plaat brandt. Elke plaat heeft een eigen zaadje: dezelfde
+   wereld, nooit hetzelfde beeld.
+   ================================================================ */
+
+const TAU = Math.PI * 2;
+const $ = s => document.querySelector(s);
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const smoother = t => t * t * t * (t * (t * 6 - 15) + 10);
+function mulberry32(a) {
+  return () => {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- zaad ---------- */
+const qs = new URLSearchParams(location.search);
+let seed = parseInt(qs.get('plaat'), 10);
+if (!Number.isFinite(seed) || seed < 0) seed = Math.floor(Math.random() * 1e6);
+seed = seed % 1e6;
+const rand = mulberry32(((seed * 2654435761) >>> 0) ^ 0x9e3779b9);
+const R = (a, b) => a + (b - a) * rand();
+const shuffle = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPEED = calm ? 0.4 : 1;
+
+/* ---------- canvassen ---------- */
+const ex = $('#exposure'), exc = ex.getContext('2d', { alpha: false });
+const ch = $('#chrono'), cc = ch.getContext('2d');
+const sl = $('#slit'), slc = sl.getContext('2d');
+
+let W = 0, H = 0, DPR = 1, MOBILE = false;
+let BW = 0, BH = 0, N = 0, Rb, Gb, Bb, img, pix;
+let LX = .64, LY = .48, S = 100;
+let SW = 0, SH = 0;
+
+function resize() {
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight); DPR = Math.min(devicePixelRatio || 1, 2);
+  MOBILE = W < 720;
+  LX = MOBILE ? .6 : .63; LY = MOBILE ? .26 : .47;
+  S = MOBILE ? Math.min(W * .19, H * .1) : Math.min(W, H) * .155;
+
+  const budget = MOBILE ? 230000 : 480000;
+  const sc = Math.min(.7, Math.sqrt(budget / (W * H)));
+  BW = Math.max(4, Math.round(W * sc)); BH = Math.max(4, Math.round(H * sc)); N = BW * BH;
+  ex.width = BW; ex.height = BH;
+  Rb = new Float32Array(N); Gb = new Float32Array(N); Bb = new Float32Array(N);
+  img = exc.createImageData(BW, BH); pix = img.data;
+  GW = Math.ceil(BW / 4) + 1; GH = Math.ceil(BH / 4) + 1; Gd = new Float32Array(GW * GH);
+  for (let j = 3; j < pix.length; j += 4) pix[j] = 255;
+
+  ch.width = Math.max(1, Math.round(W * DPR)); ch.height = Math.max(1, Math.round(H * DPR));
+
+  const r = sl.getBoundingClientRect();
+  SW = Math.max(1, Math.round(r.width * DPR)); SH = Math.max(1, Math.round(r.height * DPR));
+  sl.width = SW; sl.height = SH;
+  slc.fillStyle = '#0d0906'; slc.fillRect(0, 0, SW, SH);
+  $('#slit-span').textContent = `← ${Math.round(r.width / SLIT_RATE)} s · nu`;
+
+  for (const s of specs) { s.snaps.length = 0; s.last = -1e9; }
+  frozen.length = 0;
+  scS = 0;
+}
+
+/* ================================================================
+   Polytopen: schaduwen uit de vierde dimensie
+   ================================================================ */
+function build(V, E, F) {
+  let m = 0;
+  for (const v of V) m = Math.max(m, Math.hypot(v[0], v[1], v[2], v[3]));
+  V = V.map(v => v.map(c => c / m));
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]);
+  if (!E) {
+    let min = Infinity;
+    for (let i = 0; i < V.length; i++) for (let j = i + 1; j < V.length; j++) { const d = dist(V[i], V[j]); if (d > 1e-9 && d < min) min = d; }
+    E = [];
+    for (let i = 0; i < V.length; i++) for (let j = i + 1; j < V.length; j++) if (Math.abs(dist(V[i], V[j]) - min) < 1e-6) E.push([i, j]);
+  }
+  if (!F) {
+    const adj = V.map(() => new Set());
+    E.forEach(([i, j]) => { adj[i].add(j); adj[j].add(i); });
+    F = [];
+    for (const [i, j] of E) for (const k of adj[i]) if (k > j && adj[j].has(k)) F.push([i, j, k]);
+  }
+  return { V, E, F };
+}
+const POLYS = [
+  () => { // tesseract
+    const V = []; for (let i = 0; i < 16; i++) V.push([i & 1 ? 1 : -1, i & 2 ? 1 : -1, i & 4 ? 1 : -1, i & 8 ? 1 : -1]);
+    const F = [];
+    for (let p = 0; p < 4; p++) for (let q = p + 1; q < 4; q++) for (let i = 0; i < 16; i++)
+      if (!(i >> p & 1) && !(i >> q & 1)) F.push([i, i | 1 << p, i | 1 << p | 1 << q, i | 1 << q]);
+    return Object.assign(build(V, null, F), { nl: 'tesseract · 8 kubussen' });
+  },
+  () => { // 16-cel
+    const V = []; for (let a = 0; a < 4; a++) for (const s of [-1, 1]) { const v = [0, 0, 0, 0]; v[a] = s; V.push(v); }
+    return Object.assign(build(V), { nl: '16-cel · 16 tetraëders' });
+  },
+  () => { // 24-cel
+    const V = []; for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++) for (const sa of [-1, 1]) for (const sb of [-1, 1]) { const v = [0, 0, 0, 0]; v[a] = sa; v[b] = sb; V.push(v); }
+    return Object.assign(build(V), { nl: '24-cel · 24 octaëders' });
+  },
+  () => { // 5-cel
+    const r = Math.sqrt(5);
+    const V = [[1, 1, 1, -1 / r], [1, -1, -1, -1 / r], [-1, 1, -1, -1 / r], [-1, -1, 1, -1 / r], [0, 0, 0, r - 1 / r]];
+    return Object.assign(build(V), { nl: '5-cel · 5 tetraëders' });
+  },
+  () => { // 6·8-duoprisma (een torus van prisma's)
+    const p = 6, q = 8, V = [], E = [], F = [];
+    for (let i = 0; i < p; i++) for (let j = 0; j < q; j++) V.push([Math.cos(TAU * i / p), Math.sin(TAU * i / p), Math.cos(TAU * j / q), Math.sin(TAU * j / q)]);
+    const id = (i, j) => ((i + p) % p) * q + ((j + q) % q);
+    for (let i = 0; i < p; i++) for (let j = 0; j < q; j++) {
+      E.push([id(i, j), id(i + 1, j)]); E.push([id(i, j), id(i, j + 1)]);
+      F.push([id(i, j), id(i + 1, j), id(i + 1, j + 1), id(i, j + 1)]);
+    }
+    return Object.assign(build(V, E, F), { nl: '6·8-duoprisma · 14 prisma’s' });
+  },
+];
+const polyOrder = shuffle([0, 1, 2, 3, 4]);
+let polyIdx = 0;
+const POLY_PERIOD = 220; // seconden per lichaam
+
+const PL = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+const DW = 2.6, DZ = 3.3;
+const NSNAP = 22, SNAP_DT = .12;
+
+class Specimen {
+  constructor(poly) {
+    this.poly = poly; this.V = poly.V; this.E = poly.E; this.F = poly.F; this.n = poly.V.length;
+    this.cur = new Float32Array(this.n * 3);
+    this.snaps = []; this.last = -1e9; this.alpha = 0; this.target = 1;
+    this.ang = PL.map(() => R(0, TAU));
+    this.om = PL.map(([, j]) => (j === 3 ? R(.07, .16) : R(.012, .045)) * (rand() < .5 ? -1 : 1));
+    this.c = new Float64Array(6); this.s = new Float64Array(6); this.q = new Float64Array(4);
+    this.glow = new Float32Array(this.n); // hoeveel gloed er op elk hoekpunt valt
+  }
+  step(dt, cx, cy, sc, excite) {
+    const { c, s, q, cur, V, n } = this;
+    for (let k = 0; k < 6; k++) { this.ang[k] += this.om[k] * dt * (1 + excite * 2.4); c[k] = Math.cos(this.ang[k]); s[k] = Math.sin(this.ang[k]); }
+    for (let v = 0; v < n; v++) {
+      const src = V[v]; q[0] = src[0]; q[1] = src[1]; q[2] = src[2]; q[3] = src[3];
+      for (let k = 0; k < 6; k++) { const i = PL[k][0], j = PL[k][1], a = q[i], b = q[j]; q[i] = a * c[k] - b * s[k]; q[j] = a * s[k] + b * c[k]; }
+      const kw = DW / (DW - q[3]);
+      const x = q[0] * kw, y = q[1] * kw, z = q[2] * kw;
+      const kz = DZ / (DZ - z);
+      cur[3 * v] = cx + x * kz * sc;
+      cur[3 * v + 1] = cy + y * kz * sc;
+      cur[3 * v + 2] = clamp(.5 + .3 * z + .42 * q[3], 0, 1);
+    }
+  }
+  snap(t) {
+    if (t - this.last < SNAP_DT) return;
+    this.last = t;
+    const s = this.snaps.length >= NSNAP ? this.snaps.pop() : { p: new Float32Array(this.n * 3), d: new Float32Array(this.n * 2), f: 0, t: 0 };
+    s.p.set(this.cur); s.t = t;
+    this.snaps.unshift(s);
+  }
+  draw(ctx, now, a) {
+    if (a < .004) return;
+    const { n, E, F, cur, snaps: sn } = this;
+    const maxAge = NSNAP * SNAP_DT;
+    for (const s of sn) {
+      const age = now - s.t; disp(age);
+      s.f = clamp(1 - age / maxAge, 0, 1);
+      for (let v = 0; v < n; v++) { s.d[2 * v] = s.p[3 * v] + DX; s.d[2 * v + 1] = s.p[3 * v + 1] + DY; }
+    }
+    // wereldlijnen: elk hoekpunt trekt een spoor door de tijd
+    ctx.lineWidth = .6;
+    for (let k = 0; k < sn.length; k++) {
+      const s = sn[k], fa = Math.pow(s.f, 1.25) * .22 * a;
+      if (fa < .004) continue;
+      ctx.strokeStyle = `rgba(214,160,84,${fa})`;
+      ctx.beginPath();
+      for (let v = 0; v < n; v++) {
+        if (k === 0) ctx.moveTo(cur[3 * v], cur[3 * v + 1]); else ctx.moveTo(sn[k - 1].d[2 * v], sn[k - 1].d[2 * v + 1]);
+        ctx.lineTo(s.d[2 * v], s.d[2 * v + 1]);
+      }
+      ctx.stroke();
+    }
+    // stroboscopische echo's, oudste eerst
+    for (let k = sn.length - 1; k >= 0; k--) {
+      const s = sn[k], f = s.f;
+      if (f <= 0) continue;
+      const al = Math.pow(f, 1.6) * .4 * a;
+      // oude echo's nemen de kleur van de gloed aan, verse zijn oker
+      const r = lerp(ECHO[0], 220, f) | 0, g = lerp(ECHO[1], 168, f) | 0, b = lerp(ECHO[2], 96, f) | 0;
+      const d = s.d;
+      if (k % 4 === 2) {
+        ctx.fillStyle = `rgba(${r},${g},${b},${al * .07})`;
+        for (const face of F) {
+          ctx.beginPath(); ctx.moveTo(d[2 * face[0]], d[2 * face[0] + 1]);
+          for (let m = 1; m < face.length; m++) ctx.lineTo(d[2 * face[m]], d[2 * face[m] + 1]);
+          ctx.closePath(); ctx.fill();
+        }
+      }
+      ctx.strokeStyle = `rgba(${r},${g},${b},${al})`;
+      ctx.lineWidth = .45 + .55 * f;
+      ctx.beginPath();
+      for (const [i, j] of E) { ctx.moveTo(d[2 * i], d[2 * i + 1]); ctx.lineTo(d[2 * j], d[2 * j + 1]); }
+      ctx.stroke();
+      ctx.fillStyle = `rgba(240,224,196,${al * .9})`;
+      for (let v = 0; v < n; v++) ctx.fillRect(d[2 * v] - .8, d[2 * v + 1] - .8, 1.6, 1.6);
+    }
+    // het heden: kubistische vlakken
+    for (const face of F) {
+      let lum = 0; for (const i of face) lum += cur[3 * i + 2]; lum /= face.length;
+      ctx.fillStyle = `rgba(${lerp(150, 214, lum) | 0},${lerp(80, 150, lum) | 0},${lerp(50, 70, lum) | 0},${(.018 + .05 * lum * lum) * a})`;
+      ctx.beginPath(); ctx.moveTo(cur[3 * face[0]], cur[3 * face[0] + 1]);
+      for (let m = 1; m < face.length; m++) ctx.lineTo(cur[3 * face[m]], cur[3 * face[m] + 1]);
+      ctx.closePath(); ctx.fill();
+    }
+    // het heden: ribben, in drie dieptes — ribben die door de gloed snijden lichten op
+    const AL = [.26, .55, .95], gl = this.glow;
+    for (let bkt = 0; bkt < 3; bkt++) {
+      ctx.strokeStyle = `rgba(240,226,200,${AL[bkt] * a})`;
+      ctx.lineWidth = .7 + .45 * bkt;
+      ctx.beginPath();
+      for (const [i, j] of E) {
+        const lum = (cur[3 * i + 2] + cur[3 * j + 2]) * .5 + (gl[i] + gl[j]) * .09;
+        const bb = lum < .38 ? 0 : lum < .62 ? 1 : 2;
+        if (bb !== bkt) continue;
+        ctx.moveTo(cur[3 * i], cur[3 * i + 1]); ctx.lineTo(cur[3 * j], cur[3 * j + 1]);
+      }
+      ctx.stroke();
+    }
+    for (let v = 0; v < n; v++) {
+      const g = gl[v];
+      if (g < .35) continue;
+      const rad = 3 + 7 * g;
+      const hg = ctx.createRadialGradient(cur[3 * v], cur[3 * v + 1], 0, cur[3 * v], cur[3 * v + 1], rad);
+      hg.addColorStop(0, `rgba(255,214,150,${.16 * Math.min(g, 1.6) * a})`); hg.addColorStop(1, 'rgba(255,214,150,0)');
+      ctx.fillStyle = hg; ctx.fillRect(cur[3 * v] - rad, cur[3 * v + 1] - rad, rad * 2, rad * 2);
+    }
+    ctx.fillStyle = `rgba(255,240,214,${.85 * a})`;
+    for (let v = 0; v < n; v++) {
+      const lum = cur[3 * v + 2];
+      ctx.beginPath(); ctx.arc(cur[3 * v], cur[3 * v + 1], .6 + 1.7 * lum + .9 * Math.min(gl[v], 1.6), 0, TAU); ctx.fill();
+    }
+  }
+}
+
+const specs = [];
+function addSpecimen() {
+  const p = POLYS[polyOrder[polyIdx % POLYS.length]]();
+  const s = new Specimen(p);
+  specs.push(s);
+  $('#l-obj').textContent = p.nl;
+  return s;
+}
+
+/* ================================================================
+   De tijdas: waar het verleden naartoe stroomt
+   ================================================================ */
+let tvx = Math.cos(-2.45), tvy = Math.sin(-2.45);
+const baseAng = -2.45 + R(-.35, .35);
+const angPh = R(0, TAU), curlPh = R(0, TAU);
+let curl = 0, tvSpeed = 80;
+let DX = 0, DY = 0;
+function disp(age) {
+  const base = Math.atan2(tvy, tvx), v = tvSpeed;
+  if (Math.abs(curl) < 1e-3) { DX = Math.cos(base) * v * age; DY = Math.sin(base) * v * age; return; }
+  DX = v / curl * (Math.sin(base + curl * age) - Math.sin(base));
+  DY = -v / curl * (Math.cos(base + curl * age) - Math.cos(base));
+}
+
+/* ================================================================
+   Lange sluitertijd: Clifford-attractor
+   x' = sin(a·y) + c·cos(a·x)    y' = sin(b·x) + d·cos(b·y)
+   ================================================================ */
+const CLIFF = shuffle([
+  [-1.4, 1.6, 1.0, 0.7], [1.1, -1.32, -1.03, 1.54], [1.6, -0.6, -1.2, 1.6], [1.7, 1.7, 0.6, 1.2],
+  [1.5, -1.8, 1.6, 0.9], [-1.7, 1.3, -0.1, -1.21], [-1.8, -2.0, -0.5, -0.9], [-1.7, 1.8, -1.9, -0.4],
+]);
+const WOB = [0, 1, 2, 3].map(() => ({ f: R(.016, .045), p: R(0, TAU), a: R(.02, .05) }));
+const ATT_PERIOD = 150, attPh = R(0, .5), rot0 = R(0, TAU), palPh = R(0, 1);
+const ATT = [0, 0, 0, 0];
+
+/* Gezondheid: hoeveel van een 40×40-raster vult de baan? Periodieke banen
+   (een handvol puntjes) en vormloze wolken vallen allebei af. */
+const occGrid = new Uint8Array(1600);
+function occupancy(p) {
+  const [a, b, c, d] = p, ex = 1 + Math.abs(c), ey = 1 + Math.abs(d);
+  occGrid.fill(0);
+  let x = .1, y = .1, n = 0;
+  for (let k = 0; k < 4200; k++) {
+    const nx = Math.sin(a * y) + c * Math.cos(a * x); y = Math.sin(b * x) + d * Math.cos(b * y); x = nx;
+    if (k < 150) continue;
+    const gi = ((x / ex + 1) * 19.99 | 0) * 40 + ((y / ey + 1) * 19.99 | 0);
+    if (!occGrid[gi]) { occGrid[gi] = 1; n++; }
+  }
+  return n;
+}
+const healthy = p => { const o = occupancy(p); return o > 220 && o < 1150; };
+function pathHealthy(A, B) {
+  const p = [0, 0, 0, 0];
+  for (let s = 0; s <= 14; s++) {
+    const m = s / 14;
+    for (let k = 0; k < 4; k++) p[k] = lerp(A[k], B[k], m) + (rand() * 2 - 1) * .05;
+    if (!healthy(p)) return false;
+  }
+  return true;
+}
+const sgn = () => rand() < .5 ? -1 : 1;
+function randomSet() { return [sgn() * R(1.1, 2.1), sgn() * R(1.1, 2.1), sgn() * R(.4, 1.9), sgn() * R(.4, 1.9)]; }
+const SEQ = [];
+(function firstSet() {
+  for (const s of CLIFF) if (healthy(s)) { SEQ.push(s); return; }
+  SEQ.push([-1.4, 1.6, 1.0, 0.7]);
+})();
+function extendSeq() {
+  const A = SEQ[SEQ.length - 1];
+  for (let tries = 0; tries < 40; tries++) {
+    const B = rand() < .45 ? CLIFF[Math.floor(rand() * CLIFF.length)] : randomSet();
+    if (B === A || !healthy(B)) continue;
+    if (pathHealthy(A, B)) { SEQ.push(B); return; }
+  }
+  SEQ.push(A); // niets gevonden: blijf nog een periode staan
+}
+for (let i = 0; i < 3; i++) extendSeq();
+
+function attParams(t) {
+  const ph = t / ATT_PERIOD + attPh, i = Math.floor(ph), fr = ph - i;
+  const m = smoother(clamp((fr - .52) / .48, 0, 1));
+  while (SEQ.length < i + 3) extendSeq();
+  const A = SEQ[i], B = SEQ[i + 1];
+  for (let k = 0; k < 4; k++) ATT[k] = lerp(A[k], B[k], m) + WOB[k].a * Math.sin(t * WOB[k].f * TAU + WOB[k].p);
+  // het object roert in de gloed: zijn draaiing door de vierde dimensie trekt aan de parameters
+  const sp = specs[specs.length - 1];
+  if (sp) { ATT[0] += .03 * Math.sin(sp.ang[2]); ATT[1] += .03 * Math.sin(sp.ang[4]); ATT[3] += .025 * Math.cos(sp.ang[5]); }
+  return ATT;
+}
+const PAL = [[.88, .58, .24], [.66, .28, .12], [.95, .86, .68], [.36, .56, .53], [.76, .42, .30], [.92, .72, .40]];
+const col = [0, 0, 0];
+function palette(t) {
+  t = ((t % 1) + 1) % 1 * PAL.length;
+  const i = Math.floor(t), f = smoother(t - i), A = PAL[i], B = PAL[(i + 1) % PAL.length];
+  col[0] = lerp(A[0], B[0], f); col[1] = lerp(A[1], B[1], f); col[2] = lerp(A[2], B[2], f);
+  return col;
+}
+const ORB = 8, LUTN = 48, LUT = new Float32Array(LUTN * 3);
+const ECHO = [154, 79, 44];          // kleur die de echo's van de gloed lenen
+const OBJ = { x: 0, y: 0, lens: 1 }; // waar het object staat en hoe sterk het de ruimte buigt
+const ripples = [];                  // schokgolven van flitsen
+const LIGHT = { x: 0, y: 0, i: 0 };  // het ontwikkellicht van de muis
+let GW = 1, GH = 1, Gd = new Float32Array(1), meanG = 1; // grove kaart van alleen de attractor
+const ox = new Float64Array(ORB), oy = new Float64Array(ORB);
+for (let o = 0; o < ORB; o++) { ox[o] = R(-1, 1); oy[o] = R(-1, 1); }
+let scS = 0, expo = 0, meanCh = 1, quality = 1;
+
+function splat(x, y, w, r, g, b) {
+  if (x < 0 || y < 0 || x >= BW - 1 || y >= BH - 1) return;
+  const ix = x | 0, iy = y | 0, fx = x - ix, fy = y - iy, i = iy * BW + ix;
+  const w00 = (1 - fx) * (1 - fy) * w, w10 = fx * (1 - fy) * w, w01 = (1 - fx) * fy * w, w11 = fx * fy * w;
+  Rb[i] += r * w00; Gb[i] += g * w00; Bb[i] += b * w00;
+  Rb[i + 1] += r * w10; Gb[i + 1] += g * w10; Bb[i + 1] += b * w10;
+  Rb[i + BW] += r * w01; Gb[i + BW] += g * w01; Bb[i + BW] += b * w01;
+  Rb[i + BW + 1] += r * w11; Gb[i + BW + 1] += g * w11; Bb[i + BW + 1] += b * w11;
+}
+
+function nightness() {
+  const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+  return (Math.cos((h - 2) / 24 * TAU) + 1) / 2; // 1 om 02:00, 0 om 14:00
+}
+let night = nightness();
+
+function stepExposure(dt, t) {
+  const [a, b, c, d] = attParams(t);
+  const ext = Math.hypot(1 + Math.abs(c), 1 + Math.abs(d));
+  const target = Math.min(BW, BH) * (MOBILE ? .5 : .5) / ext * (MOBILE ? 1.15 : 1.06);
+  scS = scS ? lerp(scS, target, 1 - Math.exp(-dt * .4)) : target;
+  const rot = t * TAU / 720 + rot0;
+  const ca = Math.cos(rot) * scS, sa = Math.sin(rot) * scS;
+  const cx = LX * BW, cy = LY * BH;
+  const iters = Math.round(N * .085 * quality), per = Math.ceil(iters / ORB);
+  const nr = 1 - .16 * night, nb = 1 + .14 * night;
+
+  // kleur naar sprongafstand: snelle delen van de baan krijgen een andere tint dan trage
+  const base = t / 41 + palPh;
+  for (let L = 0; L < LUTN; L++) {
+    palette(base + L / LUTN * .62);
+    LUT[3 * L] = col[0] * nr; LUT[3 * L + 1] = col[1]; LUT[3 * L + 2] = col[2] * nb;
+  }
+  palette(base + .31);
+  ECHO[0] = lerp(ECHO[0], col[0] * nr * 200, .05); ECHO[1] = lerp(ECHO[1], col[1] * 170, .05); ECHO[2] = lerp(ECHO[2], col[2] * nb * 150, .05);
+  const inv = LUTN / (2.2 * ext);
+
+  // zwaartekrachtlens: rond het object wordt de ruimte uitgerekt
+  const kx = BW / W, ky = BH / H;
+  const lx = OBJ.x * kx, ly = OBJ.y * ky;
+  const LR = S * kx * 2.2, LR2 = LR * LR, LA = LR * .4 * OBJ.lens;
+  // schokgolven, omgerekend naar buffer-pixels
+  const RP = [];
+  for (let r = ripples.length - 1; r >= 0; r--) {
+    const age = t - ripples[r];
+    if (age > 4.5) { ripples.splice(r, 1); continue; }
+    const fade = Math.exp(-age / 1.4);
+    RP.push(age * 210 * kx, 26 * kx, 16 * kx * fade, 1.6 * fade);
+  }
+  const nRP = RP.length;
+
+  for (let o = 0; o < ORB; o++) {
+    let x = ox[o], y = oy[o];
+    if (rand() < .01) { x = R(-1, 1); y = R(-1, 1); for (let k = 0; k < 30; k++) { const nx = Math.sin(a * y) + c * Math.cos(a * x); y = Math.sin(b * x) + d * Math.cos(b * y); x = nx; } }
+    for (let k = 0; k < per; k++) {
+      const nx = Math.sin(a * y) + c * Math.cos(a * x);
+      const ny = Math.sin(b * x) + d * Math.cos(b * y);
+      let L = ((Math.abs(nx - x) + Math.abs(ny - y)) * inv) | 0; if (L >= LUTN) L = LUTN - 1;
+      x = nx; y = ny;
+      let px = cx + x * ca - y * sa, py = cy + x * sa + y * ca, w = 1;
+      const dx = px - lx, dy = py - ly, d2 = dx * dx + dy * dy;
+      if (d2 < LR2 || nRP) {
+        const dd = Math.sqrt(d2) + 1e-3, ux = dx / dd, uy = dy / dd;
+        let push = 0;
+        if (d2 < LR2) {
+          // uitrekken, maar de lichthoeveelheid behouden: samengeperste banen worden zwakker
+          const u = 1 - dd / LR; push = LA * u * u;
+          w *= Math.sqrt(Math.max(.05, (1 - 2 * LA * u / LR) * dd / (dd + push)));
+        }
+        for (let r = 0; r < nRP; r += 4) {
+          const off = dd - RP[r];
+          if (off > -RP[r + 1] && off < RP[r + 1]) { const f = 1 - Math.abs(off) / RP[r + 1]; push += RP[r + 2] * f * f; w += RP[r + 3] * f; }
+        }
+        px += ux * push; py += uy * push;
+      }
+      if (px < 0 || py < 0 || px >= BW || py >= BH) continue;
+      const ix = px | 0, iy = py | 0, i = iy * BW + ix;
+      Rb[i] += LUT[3 * L] * w; Gb[i] += LUT[3 * L + 1] * w; Bb[i] += LUT[3 * L + 2] * w;
+      Gd[(iy >> 2) * GW + (ix >> 2)] += 1;
+    }
+    ox[o] = x; oy[o] = y;
+  }
+
+  // wat valt er aan gloed op elk hoekpunt? (alleen de attractor telt, niet de eigen sporen)
+  const DG = Math.pow(.9915, dt * 60);
+  let gs = 0, gc = 0;
+  for (let i = 0; i < Gd.length; i++) { const v = Gd[i] * DG; Gd[i] = v; if (v > .05) { gs += v; gc++; } }
+  if (gc > 20) meanG = gs / gc;
+  for (const s of specs) {
+    for (let v = 0; v < s.n; v++) {
+      const gx = (s.cur[3 * v] * kx) >> 2, gy = (s.cur[3 * v + 1] * ky) >> 2;
+      const raw = gx >= 0 && gy >= 0 && gx < GW && gy < GH ? Gd[gy * GW + gx] / (meanG * 1.6) : 0;
+      s.glow[v] = lerp(s.glow[v], Math.min(raw, 2.5), .12);
+    }
+  }
+
+  // de lichtsporen van de hoekpunten (Marey's lampjes)
+  for (const s of specs) {
+    const w0 = meanCh * 1.1 * s.alpha;
+    if (w0 <= 0) continue;
+    for (let v = 0; v < s.n; v++) {
+      const lum = s.cur[3 * v + 2];
+      splat(s.cur[3 * v] * kx, s.cur[3 * v + 1] * ky, w0 * (.25 + lum), .95, .78, .52);
+    }
+  }
+
+  // verval + tonemapping
+  const D = Math.pow(.9915, dt * 60);
+  const flick = 1 + .045 * (Math.sin(t * 1.7) + .6 * Math.sin(t * 2.9 + 1) + 1.2 * Math.sin(t * .37)) / 2.8;
+  const k = expo * flick * (1 - .12 * night);
+  const thr = meanCh * .03;
+  let sum = 0, cnt = 0;
+  for (let i = 0, j = 0; i < N; i++, j += 4) {
+    const r = Rb[i] * D, g = Gb[i] * D, bl = Bb[i] * D;
+    Rb[i] = r; Gb[i] = g; Bb[i] = bl;
+    const s = r + g + bl;
+    if (s > thr) { sum += s; cnt++; }
+    // tonemapping op luminantie: de kleur blijft, alleen de helderheid verzadigt
+    const m = s * k, q = k / (1 + m * .55) * 205;
+    pix[j] = 13 + r * q;
+    pix[j + 1] = 9 + g * q;
+    pix[j + 2] = 6 + bl * q;
+  }
+  if (cnt > 50) {
+    meanCh = sum / cnt / 3;
+    const kt = .32 / meanCh;
+    expo = expo ? lerp(expo, kt, 1 - Math.exp(-dt * 1.5)) : kt;
+  }
+
+  // ontwikkellicht: als een lamp in de doka haalt de muis vervaagde sporen terug
+  if (LIGHT.i > .01) {
+    const sg = Math.min(W, H) * .15 * kx, inv2 = 1 / (sg * sg), Li = LIGHT.i;
+    const lcx = LIGHT.x * kx, lcy = LIGHT.y * ky, ext2 = sg * 2.3;
+    const x0 = Math.max(0, lcx - ext2 | 0), x1 = Math.min(BW - 1, lcx + ext2 | 0);
+    const y0 = Math.max(0, lcy - ext2 | 0), y1 = Math.min(BH - 1, lcy + ext2 | 0);
+    for (let y = y0; y <= y1; y++) {
+      const ddy = (y - lcy) * (y - lcy);
+      for (let x = x0; x <= x1; x++) {
+        const gg = Math.exp(-((x - lcx) * (x - lcx) + ddy) * inv2);
+        if (gg < .01) continue;
+        const i = y * BW + x, j = i << 2;
+        const r = Rb[i], g = Gb[i], bl = Bb[i];
+        const kk = k * (1 + 3.2 * Li * gg), m = (r + g + bl) * kk, q = kk / (1 + m * .55) * 205;
+        const warm = Li * gg;
+        pix[j] = 13 + r * q + 20 * warm;
+        pix[j + 1] = 9 + g * q + 12 * warm;
+        pix[j + 2] = 6 + bl * q + 5 * warm;
+      }
+    }
+  }
+  exc.putImageData(img, 0, 0);
+}
+
+function burn(spec) {
+  const kx = BW / W, ky = BH / H, w = meanCh * 5;
+  for (const [i, j] of spec.E) {
+    const x0 = spec.cur[3 * i] * kx, y0 = spec.cur[3 * i + 1] * ky, x1 = spec.cur[3 * j] * kx, y1 = spec.cur[3 * j + 1] * ky;
+    const steps = Math.max(2, Math.ceil(Math.hypot(x1 - x0, y1 - y0)));
+    for (let m = 0; m <= steps; m++) { const u = m / steps; splat(lerp(x0, x1, u), lerp(y0, y1, u), w, .9, .97, .95); }
+  }
+}
+
+/* ================================================================
+   Gevangen momenten
+   ================================================================ */
+const frozen = [];
+let flash = 0, excite = 0, nextAuto = R(28, 45);
+function capture() {
+  for (const s of specs) {
+    if (s.alpha < .5) continue;
+    const p = new Float32Array(s.n * 2);
+    for (let v = 0; v < s.n; v++) { p[2 * v] = s.cur[3 * v]; p[2 * v + 1] = s.cur[3 * v + 1]; }
+    frozen.push({ p, E: s.E, t: T });
+    burn(s);
+  }
+  while (frozen.length > 8) frozen.shift();
+  ripples.push(T); while (ripples.length > 3) ripples.shift();
+  flash = 1; excite = Math.max(excite, 1);
+}
+
+/* ================================================================
+   Spleetscan
+   ================================================================ */
+const SLIT_RATE = 16; // css-pixels per seconde
+let slitAcc = 0;
+function stepSlit(dt) {
+  slitAcc += dt * SLIT_RATE * DPR;
+  let d = Math.floor(slitAcc);
+  if (d < 1) return;
+  slitAcc -= d; d = Math.min(d, 6);
+  slc.globalCompositeOperation = 'copy';
+  slc.drawImage(sl, -d, 0);
+  slc.globalCompositeOperation = 'source-over';
+  const x = LX * W;
+  slc.drawImage(ex, clamp(Math.round(x * BW / W), 0, BW - 1), 0, 1, BH, SW - d, 0, d, SH);
+  slc.globalCompositeOperation = 'lighter';
+  slc.drawImage(ch, clamp(Math.round(x * DPR), 0, ch.width - 1), 0, 1, ch.height, SW - d, 0, d, SH);
+  slc.globalCompositeOperation = 'source-over';
+}
+
+/* ================================================================
+   Invoer
+   ================================================================ */
+let ptrX = 0, ptrY = 0, lastPtr = -1e9, lastInput = performance.now() / 1000, focusEl = null;
+const wake = () => { lastInput = performance.now() / 1000; document.body.classList.remove('idle'); };
+addEventListener('pointermove', e => {
+  ptrX = e.clientX; ptrY = e.clientY; lastPtr = performance.now() / 1000; wake();
+  if (LIGHT.i < .02) { LIGHT.x = ptrX; LIGHT.y = ptrY; }
+}, { passive: true });
+addEventListener('pointerdown', e => {
+  wake();
+  if (e.target.closest && e.target.closest('a')) return;
+  ptrX = e.clientX; ptrY = e.clientY; lastPtr = performance.now() / 1000;
+  capture();
+});
+addEventListener('wheel', wake, { passive: true });
+addEventListener('keydown', e => {
+  wake();
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'f' || e.key === 'F') {
+    if (document.fullscreenElement) document.exitFullscreen?.(); else document.documentElement.requestFullscreen?.().catch(() => {});
+  } else if (e.key === ' ' && !(e.target.closest && e.target.closest('a'))) { e.preventDefault(); capture(); }
+});
+document.querySelectorAll('.step').forEach(el => {
+  const key = el.dataset.key;
+  const on = () => {
+    if (focusEl === el) return;
+    focusEl = el;
+    const list = STORIES[key];
+    setWeetje(list[storyAt[key]++ % list.length], true);
+    wNext = Infinity;
+  };
+  const off = () => {
+    if (focusEl !== el) return;
+    focusEl = null;
+    wEl.classList.remove('hold');
+    wNext = performance.now() / 1000 - start + 12; // het verhaal blijft nog even staan
+  };
+  el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') on(); });
+  el.addEventListener('pointerleave', off);
+  el.addEventListener('focus', on); el.addEventListener('blur', off);
+});
+
+/* ================================================================
+   Weetjes
+   ================================================================ */
+/* De verhalen achter de vijf woorden op de trap. Bij hover verschijnen ze
+   rechtsonder; daarnaast draaien ze mee in de gewone roulering. */
+const STORIES = {
+  recepten: [
+    ['recept · herkomst', '<i>Recept</i> begint bij Latijn <i>recipe</i>, ‘neem!’ — de gebiedende wijs van <i>recipere</i>, ontvangen. Oude doktersvoorschriften openden ermee, afgekort tot het teken ℞. Wie een recept volgt, gehoorzaamt dus nog altijd een eeuwenoud bevel.'],
+    ['recept · herkomst', 'Een recept was eerst een doktersvoorschrift — je haalt het nog steeds bij de apotheek. De keuken leende het woord later. Apotheek en fornuis delen zo één werkwoord: <i>neem</i>.'],
+    ['recept · familie', 'In <i>recipere</i> zit <i>capere</i>, ‘pakken’. Daar stammen ook receptie, recipiënt, capabel en capaciteit van af: allemaal woorden over iets kunnen opvangen en vasthouden.'],
+    ['recept · weetje', 'Het oudste bewaarde kookboek uit de Lage Landen is het <i>Wel ende edelike spijse</i>, een handschrift uit de 15e eeuw. Hoeveelheden en kooktijden stonden er nauwelijks in: de kok wist het wel.'],
+  ],
+  fotos: [
+    ['foto · herkomst', '<i>Foto</i> is kort voor <i>fotografie</i>: Grieks <i>phōs</i> (genitief <i>phōtos</i>), ‘licht’, en <i>graphein</i>, ‘schrijven’ — oorspronkelijk zelfs ‘krassen’. Licht dat in een plaat krast.'],
+    ['foto · herkomst', 'John Herschel maakte het woord <i>photography</i> in 1839 bekend. In Brazilië had de Franse uitvinder Hercule Florence <i>photographie</i> al in 1834 opgeschreven — maar dat bleef anderhalve eeuw onbekend.'],
+    ['foto · weetje', 'De oudste bewaarde foto uit een camera maakte Nicéphore Niépce rond 1826–1827: het uitzicht uit zijn raam in Le Gras. De belichting duurde uren, misschien dagen — de zon staat op beide gevels.'],
+    ['foto · weetje', 'Daguerres foto van de Boulevard du Temple (1838) toont een drukke straat die leeg lijkt: alles wat bewoog was te snel voor de lange belichting. Alleen een man die zijn schoenen liet poetsen stond stil genoeg. Hij is de eerste mens op een foto.'],
+  ],
+  nas: [
+    ['network · herkomst', '<i>Network</i> is letterlijk <i>net-werk</i>: werk in de vorm van een net. Het Engels kent het sinds 1560, toen de Geneva-bijbel een rooster beschreef ‘like networke of brass’. Pas in de 20e eeuw gingen spoorlijnen, zenders en computers netwerken heten.'],
+    ['attached · herkomst', '<i>Attach</i> komt van Oudfrans <i>atachier</i>, ‘vastmaken’, uit Frankisch <i>*stakka</i>: een staak, familie van ons woord staak. Iets <i>attached</i> is dus aan een paal vastgezet. <i>Attack</i> is zijn tweelingbroer, via het Italiaans.'],
+    ['storage · herkomst', '<i>Storage</i> komt van <i>store</i>, Oudfrans <i>estorer</i>, ‘bevoorraden’, uit Latijn <i>instaurare</i>, ‘herstellen, vernieuwen’. Dezelfde stam zit in <i>restaurare</i>: opslag en restaurant zijn verre neven.'],
+    ['data · herkomst', '<i>Data</i> is het meervoud van Latijn <i>datum</i>, ‘het gegevene’, van <i>dare</i>, geven. Ook de datum op een brief komt daarvandaan: Romeinse brieven eindigden met <i>data Romae</i>, ‘gegeven te Rome’.'],
+    ['byte · herkomst', '<i>Byte</i> is een opzettelijke spelfout. Werner Buchholz van IBM bedacht het in 1956 als <i>bite</i>, een hap bits, en verving de i door een y zodat niemand het met <i>bit</i> zou verwarren.'],
+  ],
+  thuis: [
+    ['huis · herkomst', '<i>Huis</i> gaat terug op Proto-Germaans <i>*hūsą</i>. Waar dat zelf vandaan komt is onzeker; vaak wordt gedacht aan een wortel voor ‘bedekken’. <i>Thuis</i> is samengetrokken uit <i>te huis</i>, zoals het Engels <i>at home</i> zegt.'],
+    ['huis · klank', 'Ooit zeiden alle Germanen iets als <i>hoes</i>. Het Fries zegt nog steeds <i>hûs</i>; het Engels maakte er <i>house</i> van, het Duits <i>Haus</i>, en in Holland groeide de klinker uit tot de typisch Nederlandse <i>ui</i>.'],
+    ['huis · familie', 'Een <i>husband</i> is etymologisch een huisbewoner: Oudnoors <i>húsbóndi</i>, van <i>hús</i> en <i>bóndi</i>, boer. En het Engelse <i>hussy</i> is een afgesleten <i>housewife</i>.'],
+    ['home assistant · herkomst', '<i>Home</i> is familie van ons <i>heem</i> — heemkunde, heemraad — en van de -hem en -um in plaatsnamen als Arnhem en Hilversum. <i>Assistant</i> komt van Latijn <i>assistere</i>: ‘erbij gaan staan’.'],
+  ],
+  pomodroppo: [
+    ['pomodoro · herkomst', '<i>Pomodoro</i> komt van <i>pomo d’oro</i>, ‘gouden appel’. Halverwege de 16e eeuw beschreef de Italiaanse botanicus Mattioli de nieuwe vrucht uit Amerika zo — waarschijnlijk waren de eerste tomaten in Europa geel.'],
+    ['pomodoro · familie', 'In <i>pomo</i> zit Latijn <i>pomum</i>, dat gewoon ‘vrucht’ betekende. Het Frans maakte er <i>pomme de terre</i> van, en ons woord <i>aardappel</i> zegt precies hetzelfde.'],
+    ['pomodoro · weetje', 'De Pomodoro-techniek bedacht Francesco Cirillo eind jaren tachtig als student, met een keukenwekker in de vorm van een tomaat: 25 minuten werken, dan even pauze. Elke tomaat is één ronde.'],
+    ['drop · herkomst', '<i>Drop</i> is genoemd naar zijn oude vorm: een druppel. Een dropje is dus letterlijk een druppeltje — zoet, zwart en, in dit huis, ook een koosnaam.'],
+    ['drop · familie', 'Drop wordt gemaakt van zoethout. Het Engelse <i>liquorice</i> komt via het Latijn van Grieks <i>glukurrhiza</i>, ‘zoete wortel’ — ons <i>zoethout</i> is bijna een letterlijke vertaling.'],
+  ],
+};
+const storyAt = { recepten: 0, fotos: 0, nas: 0, thuis: 0, pomodroppo: 0 };
+for (const k in storyAt) storyAt[k] = Math.floor(rand() * STORIES[k].length);
+
+const WEETJES = [
+  // etymologie
+  ['tijd · etymologie', '<i>Tijd</i> en <i>tij</i> zijn familie: beide komen van Proto-Germaans <i>*tīdiz</i>, ‘afgemeten stuk’. Aan de kust was het getij de oudste klok.'],
+  ['etymologie', '<i>Minuut</i> komt van <i>pars minuta prima</i>, ‘het eerste verkleinde deel’ van het uur. <i>Seconde</i> is <i>pars minuta secunda</i>: het tweede.'],
+  ['etymologie', '<i>Kalender</i> komt van Latijn <i>kalendae</i>, de eerste dag van de maand — de dag waarop schulden betaald moesten worden.'],
+  ['etymologie', '<i>Uur</i>, Latijn <i>hora</i>, Grieks <i>hōra</i>: eerst ‘seizoen’ of ‘het juiste moment’, pas veel later een vast deel van de dag.'],
+  ['etymologie', '<i>Planeet</i> komt van Grieks <i>planētēs</i>, ‘zwerver’: de sterren die niet stil wilden blijven staan.'],
+  ['etymologie', '<i>Horizon</i> komt van Grieks <i>horizōn kuklos</i>, ‘de begrenzende cirkel’ — verwant aan <i>horos</i>, de grenspaal.'],
+  ['etymologie', '<i>Desastreus</i> gaat terug op Italiaans <i>dis-astro</i>, ‘slecht gesternte’. Een ramp was eerst een astrologisch probleem.'],
+  ['etymologie', '<i>Mazzel</i> komt via het Jiddisch van Hebreeuws <i>mazal</i>, ‘sterrenbeeld’. Geluk en ongeluk kwamen allebei uit de lucht.'],
+  ['etymologie', '<i>Algoritme</i> is een verbastering van al-Khwārizmī, de Perzische wiskundige die rond 820 in Bagdad werkte.'],
+  ['etymologie', '<i>Tesseract</i> werd in 1888 bedacht door Charles Howard Hinton: Grieks <i>tessera</i> ‘vier’ + <i>aktis</i> ‘straal’ — uit elke hoek vertrekken vier ribben.'],
+  ['etymologie', '<i>Pecorella</i> is Italiaans voor ‘schaapje’, van Latijn <i>pecus</i>, vee. Daar komt ook <i>pecunia</i> vandaan: geld, toen rijkdom nog in vee werd geteld.'],
+  ['etymologie', '<i>Seizoen</i> komt van Latijn <i>satio</i>, ‘het zaaien’. Een jaargetijde was ooit simpelweg: zaaitijd.'],
+  ['etymologie', '<i>Klok</i> komt van Middeleeuws-Latijn <i>clocca</i>, ‘bel’. De eerste uurwerken hadden geen wijzerplaat — ze sloegen alleen.'],
+  ['etymologie', '<i>Tomaat</i> komt van Nahuatl <i>tomatl</i>, de taal van de Azteken. Ook <i>chocolade</i>, <i>avocado</i> en <i>chili</i> komen uit het Nahuatl.'],
+  ['etymologie', '<i>Woensdag</i> is de dag van Wodan, <i>donderdag</i> die van Donar, <i>vrijdag</i> die van Frija. <i>Zaterdag</i> bleef Romeins: de dag van Saturnus.'],
+  ['etymologie', '<i>Dinsdag</i> is vernoemd naar <i>Mars Thingsus</i>, de Germaanse god van het <i>ding</i>: de volksvergadering waar recht werd gesproken.'],
+  ['etymologie', '<i>Quarantaine</i> komt van Italiaans <i>quaranta giorni</i>, veertig dagen: zo lang moesten schepen in Venetië tijdens de pest voor anker blijven.'],
+  ['etymologie', '<i>Spier</i> heet in het Latijn <i>musculus</i>, ‘muisje’: een aangespannen spier leek op een muis die onder de huid bewoog.'],
+  ['etymologie', '<i>Melancholie</i> is Grieks <i>melaina cholē</i>, ‘zwarte gal’: volgens de oude geneeskunde maakte een teveel daarvan je somber.'],
+  ['etymologie', '<i>Robot</i> komt van Tsjechisch <i>robota</i>, ‘herendienst, dwangarbeid’. Josef Čapek bedacht het voor het toneelstuk <i>R.U.R.</i> (1920) van zijn broer Karel.'],
+  ['etymologie', '<i>Gas</i> is een verzonnen woord: de Brusselse scheikundige Jan Baptist van Helmont maakte het in de 17e eeuw, naar Grieks <i>chaos</i>.'],
+  ['etymologie', '<i>Dollar</i> komt van <i>Joachimsthaler</i>, zilveren munten uit Joachimsthal in Bohemen. In het Nederlands werd dat de <i>daalder</i>.'],
+  ['etymologie', '<i>Boulevard</i> is Nederlands in vermomming: het komt van <i>bolwerk</i>, de vestingwal die later een brede wandelweg werd.'],
+  ['etymologie', 'Het Engels leende <i>cookie</i> van ons <i>koekje</i>, <i>boss</i> van <i>baas</i>, <i>coleslaw</i> van <i>koolsla</i> en <i>yacht</i> van <i>jacht</i>.'],
+  ['etymologie', '<i>Kapot</i> komt uit het kaartspel: wie bij het Franse piket geen enkele slag haalde, was <i>capot</i>.'],
+  ['etymologie', '<i>Sleutel</i> is ‘het ding om mee te sluiten’: <i>sluiten</i> + het achtervoegsel <i>-el</i>, net als in beitel en vleugel.'],
+  ['etymologie', '<i>Salaris</i> komt van Latijn <i>salarium</i>, dat iets met zout (<i>sal</i>) te maken had. Dat Romeinse soldaten in zout werden betaald, is waarschijnlijk een mooi verzinsel.'],
+  // aardrijkskunde
+  ['aardrijkskunde', 'Het laagste punt van Nederland ligt in de Zuidplaspolder bij Nieuwerkerk aan den IJssel: 6,76 meter onder NAP.'],
+  ['aardrijkskunde', 'De Vaalserberg, ruim 322 meter, is het hoogste punt van Europees Nederland — en meteen het drielandenpunt met België en Duitsland.'],
+  ['aardrijkskunde', 'Tot zo’n achtduizend jaar geleden kon je van Nederland naar Engeland lopen, over Doggerland. Nu is het de bodem van de Noordzee.'],
+  ['aardrijkskunde', 'Nederland schuift met de Euraziatische plaat zo’n 2,5 centimeter per jaar naar het noordoosten — ongeveer zo snel als je nagels groeien.'],
+  ['aardrijkskunde', 'Op de breedte van Nederland draai je met ruim 1.000 km/u om de aardas mee. Rechtsboven houdt de plaat bij hoe ver al.'],
+  ['aardrijkskunde', 'Van 1909 tot 1937 liep de Nederlandse wettelijke tijd 19 minuten en 32,13 seconden voor op Greenwich: de zonnetijd van de Westertoren.'],
+  ['aardrijkskunde', 'Ongeveer een kwart van Nederland ligt onder zeeniveau, en zo’n 59 procent is gevoelig voor overstromingen.'],
+  ['aardrijkskunde', 'De Flevopolder is met zo’n 970 km² het grootste kunstmatige eiland ter wereld. Waar nu Almere staat, voeren tot 1968 nog schepen.'],
+  ['aardrijkskunde', 'In Baarle-Nassau en Baarle-Hertog loopt de grens dwars door huizen. Je voordeur bepaalt in welk land je woont.'],
+  ['aardrijkskunde', 'Het Paleis op de Dam staat op 13.659 houten palen. Onthouden is makkelijk: een 1, dan de 365 dagen van het jaar, dan een 9.'],
+  ['aardrijkskunde', 'De top van de Mount Everest is kalksteen vol fossielen van zeedieren: ooit was het de bodem van een oceaan.'],
+  ['aardrijkskunde', 'Tussen Groot- en Klein-Diomedes in de Beringstraat ligt nog geen 4 kilometer — en de datumgrens. Wie op het Amerikaanse eiland staat, kijkt naar morgen.'],
+  ['aardrijkskunde', 'De Waddenzee valt twee keer per dag grotendeels droog. Het is het grootste aaneengesloten getijdengebied ter wereld.'],
+  // wiskunde
+  ['wiskunde', 'De kustlijnparadox: hoe kleiner je meetlat, hoe langer een kust wordt. Mandelbrot vroeg in 1967: <i>How long is the coast of Britain?</i>'],
+  ['wiskunde', 'De Koch-sneeuwvlok heeft een oneindig lange omtrek maar een eindige oppervlakte: precies 8/5 van de driehoek waarmee hij begon.'],
+  ['wiskunde', 'De dimensie van de Koch-kromme is log 4 / log 3 ≈ 1,2619: meer dan een lijn, minder dan een vlak.'],
+  ['wiskunde', 'De rand van de Mandelbrotverzameling heeft Hausdorff-dimensie precies 2 — bewezen door Mitsuhiro Shishikura in 1998.'],
+  ['wiskunde', 'Een tesseract heeft 16 hoekpunten, 32 ribben, 24 vierkanten en 8 kubussen. Wat je ziet is zijn schaduw in drie dimensies, platgedrukt tot twee.'],
+  ['wiskunde', 'In vier dimensies bestaan precies zes regelmatige polytopen. In vijf of meer dimensies zijn het er nog maar drie.'],
+  ['wiskunde', 'De 24-cel heeft in geen enkele andere dimensie een tegenhanger: een regelmatige vorm die alleen in vier dimensies bestaat.'],
+  ['wiskunde', 'De gloed achter het object is een Clifford-attractor: twee regels sinus en cosinus, tienduizenden keren per seconde herhaald. Het object buigt hem als een zwaartekrachtlens.'],
+  ['wiskunde', 'Fibonacci’s konijnenrij (1202) is ouder dan Fibonacci: Indiase dichters telden er eeuwen eerder lettergrepen mee.'],
+  ['wiskunde', 'Een lijn kan een vlak helemaal vullen: Peano (1890) en Hilbert (1891) bouwden krommen die door elk punt van een vierkant gaan.'],
+  ['wiskunde', 'De wet van Benford: in veel echte getallenreeksen — rivierlengtes, huisnummers, rekeningen — begint zo’n 30 procent met een 1.'],
+  ['wiskunde', 'Met 23 mensen in een kamer is de kans al groter dan een half dat twee van hen op dezelfde dag jarig zijn.'],
+  ['wiskunde', 'Johann Lambert bewees in 1761 dat π irrationeel is: de decimalen herhalen zich nooit, hoe ver je ook rekent.'],
+  // kunst
+  ['kunst', 'Duchamp schilderde <i>Nu descendant un escalier n° 2</i> in 1912. De kubisten vroegen hem het terug te trekken; in 1913 werd het het schandaal van de Armory Show.'],
+  ['kunst', 'Étienne-Jules Marey bouwde in 1882 een ‘fotografisch geweer’ dat twaalf beelden per seconde schoot — om vogels in de vlucht te kunnen zien.'],
+  ['kunst', 'Eadweard Muybridge liet in 1878 met een rij camera’s zien dat een galopperend paard even alle vier de hoeven van de grond heeft.'],
+  ['kunst', 'Escher tekende in 1960 <i>Klimmen en dalen</i>: monniken op een trap die eeuwig stijgt en nergens hoger komt — naar een idee van Lionel en Roger Penrose.'],
+  ['kunst', 'Giacomo Balla schilderde in 1912 een teckel aan de lijn met een waas van pootjes: <i>Dinamismo di un cane al guinzaglio</i>. Tijd als vlek.'],
+  ['kunst', 'Monet schilderde de kathedraal van Rouen meer dan dertig keer, op steeds andere uren. Niet het gebouw was het onderwerp, maar het licht dat voorbijging.'],
+  ['kunst', 'Hiroshi Sugimoto fotografeerde bioscoopzalen met een sluitertijd van een hele film. Twee uur verhaal wordt één wit, gloeiend doek.'],
+  ['kunst', 'Michael Wesely fotografeerde de verbouwing van het MoMA met een sluitertijd van bijna drie jaar. Gebouwen verschijnen er als geesten in.'],
+  ['kunst', 'Harold Edgerton bevroor in 1957 een vallende melkdruppel met een stroboscoop: <i>Milk Drop Coronet</i>, een kroontje van een fractie van een seconde.'],
+  ['kunst', 'In Halberstadt speelt een orgel John Cages stuk <i>ORGAN²/ASLSP</i> — ‘zo langzaam mogelijk’. Het begon in 2001 en eindigt in 2640.'],
+  // tijd
+  ['tijd', 'Een dag duurde 400 miljoen jaar geleden zo’n 22 uur. Fossiele koralen tellen ongeveer 400 groeiringetjes per jaar.'],
+  ['tijd', 'Het zonlicht dat je nu ziet vertrok ruim acht minuten geleden. De zon die je ziet, is een herinnering.'],
+  ['tijd', 'Tijdens de Franse Revolutie telde de dag 10 uur van 100 minuten van 100 seconden. Rechtsboven loopt die klok gewoon door.'],
+  ['tijd', 'Een seconde is officieel 9.192.631.770 trillingen van een cesium-133-atoom. De zon en de aarde hebben er niets meer over te zeggen.'],
+  ['tijd', 'Sinds 1972 zijn er 27 schrikkelseconden aan de klok toegevoegd. Uiterlijk in 2035 wil men ermee stoppen.'],
+  ['tijd', 'Tijdzones danken we aan de trein: in 1883 voerden de Amerikaanse spoorwegen standaardtijd in, omdat elke stad zijn eigen middag had.'],
+  ['tijd', 'Op Venus duurt een dag langer dan een jaar: de planeet draait in 243 aardse dagen om zijn as en in 225 om de zon.'],
+  ['tijd', 'Het licht van Proxima Centauri, de dichtstbijzijnde ster na de zon, is ruim vier jaar onderweg. Je ziet hem zoals hij was.'],
+  ['tijd', 'Op deze plaat is tijd een richting in de ruimte: het verleden van het object drijft weg, het heden staat scherp. Wie de muis beweegt, draagt een lampje door de doka.'],
+];
+const POOL = shuffle([...WEETJES, ...Object.values(STORIES).flat()]);
+const WEETJE_DUR = 26;
+let wIdx = Math.floor(rand() * POOL.length), wNext = 0, wToken = 0;
+const wEl = $('#weetje'), wCat = $('#w-cat'), wText = $('#w-text'), wBar = $('#w-bar');
+wBar.style.setProperty('--dur', WEETJE_DUR + 's');
+function setWeetje(item, hold) {
+  const tok = ++wToken;
+  wEl.classList.add('out');
+  wEl.classList.toggle('hold', !!hold);
+  setTimeout(() => {
+    if (tok !== wToken) return;
+    wCat.textContent = item[0]; wText.innerHTML = item[1];
+    wBar.style.animation = 'none'; void wBar.offsetWidth; wBar.style.animation = '';
+    wEl.classList.remove('out');
+  }, 950);
+}
+function showWeetje() { setWeetje(POOL[wIdx++ % POOL.length], false); }
+
+/* ================================================================
+   Grootboek
+   ================================================================ */
+const plateStr = String(seed).padStart(6, '0').replace(/(\d{3})(\d{3})/, '$1 $2');
+$('#plate').textContent = '№ ' + plateStr;
+$('#plate').href = '?plaat=' + seed;
+const nf0 = new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 0 });
+const nf1 = new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nf2 = new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pad = n => String(n).padStart(2, '0');
+const lExp = $('#l-exp'), lSun = $('#l-sun'), lRot = $('#l-rot'), lDec = $('#l-dec'), lAtt = $('#l-att');
+const V_ROT = .4651 * Math.cos(52.1 * Math.PI / 180); // km/s op 52,1° NB
+function ledger(el) {
+  const e = Math.floor(el);
+  lExp.textContent = `${pad(Math.floor(e / 3600))}:${pad(Math.floor(e / 60) % 60)}:${pad(e % 60)}`;
+  lSun.textContent = nf0.format(29.78 * el) + ' km';
+  lRot.textContent = nf1.format(V_ROT * el) + ' km';
+  const d = new Date();
+  const frac = (d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000) / 86400;
+  const dec = frac * 1e5;
+  lDec.textContent = `${Math.floor(dec / 1e4)}h ${pad(Math.floor(dec / 100) % 100)}m ${pad(Math.floor(dec) % 100)}s`;
+  lAtt.textContent = ATT.map(v => nf2.format(v)).join('  ');
+}
+
+/* ================================================================
+   De lus
+   ================================================================ */
+let T = 0, last = performance.now() / 1000, start = last, ledgerAt = 0, workEma = 8;
+addSpecimen();
+resize();
+addEventListener('resize', resize);
+showWeetje();
+wNext = WEETJE_DUR;
+
+function frame() {
+  const nowR = performance.now() / 1000;
+  const dt = Math.min(.1, nowR - last); last = nowR;
+  const sdt = dt * SPEED;
+  T += sdt;
+  const elapsed = nowR - start;
+
+  // object wisselen
+  if (T > (polyIdx + 1) * POLY_PERIOD) {
+    polyIdx++;
+    for (const s of specs) s.target = 0;
+    addSpecimen();
+  }
+  for (const s of specs) s.alpha = lerp(s.alpha, s.target, 1 - Math.exp(-dt * .35 * (s.target ? 1 : 1.6)));
+  for (let i = specs.length - 1; i >= 0; i--) if (specs[i].target === 0 && specs[i].alpha < .005) specs.splice(i, 1);
+
+  // waar staat het object, waarheen stroomt de tijd
+  const cx = LX * W + W * (MOBILE ? .025 : .035) * Math.sin(T * .031 + angPh) + W * .012 * Math.sin(T * .083);
+  const cy = LY * H + H * .04 * Math.sin(T * .023 + 1.3) + H * .01 * Math.sin(T * .071);
+  const ta = baseAng + .55 * Math.sin(T * .019 + angPh) + .22 * Math.sin(T * .053);
+  const kk = 1 - Math.exp(-dt * 1.1);
+  tvx = lerp(tvx, Math.cos(ta), kk); tvy = lerp(tvy, Math.sin(ta), kk);
+  const vl = Math.hypot(tvx, tvy) || 1; tvx /= vl; tvy /= vl;
+  curl = .5 * Math.sin(T * .011 + curlPh);
+  excite = lerp(excite, focusEl ? .5 : 0, 1 - Math.exp(-dt * (focusEl ? 1.2 : .5)));
+  tvSpeed = S * (.85 + .45 * excite);
+
+  // de ruimte rond het object: de lens ademt mee met de draaiing door de vierde dimensie
+  OBJ.x = cx; OBJ.y = cy;
+  const lead = specs[specs.length - 1];
+  OBJ.lens = lead ? (.55 + .45 * Math.sin(lead.ang[2])) * lead.alpha : 0;
+
+  // het ontwikkellicht volgt de muis traag, als een kaars die je meedraagt
+  const lightOn = nowR - lastPtr < 3.5 && !focusEl;
+  LIGHT.i = lerp(LIGHT.i, lightOn ? 1 : 0, 1 - Math.exp(-dt * (lightOn ? .9 : .4)));
+  const lk = 1 - Math.exp(-dt * 2.2);
+  LIGHT.x = lerp(LIGHT.x, ptrX, lk); LIGHT.y = lerp(LIGHT.y, ptrY, lk);
+
+  // spontane flitsen, ook zonder publiek
+  if (T > nextAuto) { capture(); nextAuto = T + R(34, 70); }
+  flash *= Math.exp(-dt * 2.2);
+
+  for (const s of specs) { s.step(sdt, cx, cy, S, excite); s.snap(T); }
+
+  // ---- belichting ----
+  const t0 = performance.now();
+  stepExposure(sdt || .001, T);
+  const work = performance.now() - t0;
+  workEma = lerp(workEma, work, .05);
+  if (workEma > 11 && quality > .3) quality *= .985;
+  else if (workEma < 7 && quality < 1) quality = Math.min(1, quality * 1.005);
+
+  // ---- chronografie ----
+  cc.setTransform(DPR, 0, 0, DPR, 0, 0);
+  cc.globalCompositeOperation = 'source-over';
+  cc.clearRect(0, 0, W, H);
+  cc.globalCompositeOperation = 'lighter';
+  cc.lineCap = 'round'; cc.lineJoin = 'round';
+
+  // de spleet
+  const sx = Math.round(LX * W) + .5;
+  const g = cc.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, 'rgba(201,146,63,0)'); g.addColorStop(.2, 'rgba(201,146,63,.07)');
+  g.addColorStop(.8, 'rgba(201,146,63,.07)'); g.addColorStop(1, 'rgba(201,146,63,0)');
+  cc.strokeStyle = g; cc.lineWidth = 1;
+  cc.beginPath(); cc.moveTo(sx, 0); cc.lineTo(sx, H); cc.stroke();
+
+  // gevangen momenten drijven het verleden in
+  for (let i = frozen.length - 1; i >= 0; i--) {
+    const fr = frozen[i], age = T - fr.t;
+    if (age > 40) { frozen.splice(i, 1); continue; }
+    disp(age * .32);
+    const al = .5 * Math.exp(-age / 11) * Math.min(1, age * 4 + .2);
+    const hot = Math.exp(-age * 1.6);
+    cc.strokeStyle = `rgba(${lerp(120, 250, hot) | 0},${lerp(165, 240, hot) | 0},${lerp(158, 225, hot) | 0},${al})`;
+    cc.lineWidth = .6 + hot;
+    cc.beginPath();
+    for (const [a, b] of fr.E) { cc.moveTo(fr.p[2 * a] + DX, fr.p[2 * a + 1] + DY); cc.lineTo(fr.p[2 * b] + DX, fr.p[2 * b + 1] + DY); }
+    cc.stroke();
+  }
+
+  for (const s of specs) s.draw(cc, T, s.alpha * (1 + flash * .6));
+
+  if (flash > .01) {
+    const rg = cc.createRadialGradient(cx, cy, 0, cx, cy, S * 3);
+    rg.addColorStop(0, `rgba(255,240,214,${.22 * flash})`); rg.addColorStop(1, 'rgba(255,240,214,0)');
+    cc.fillStyle = rg; cc.fillRect(cx - S * 3, cy - S * 3, S * 6, S * 6);
+  }
+
+  stepSlit(sdt);
+
+  // ---- tekst ----
+  if (nowR - ledgerAt > .25) { ledgerAt = nowR; ledger(elapsed); night = nightness(); }
+  if (elapsed > wNext) { wNext = elapsed + WEETJE_DUR; showWeetje(); }
+  if (nowR - lastInput > 22 && !document.body.classList.contains('idle')) document.body.classList.add('idle');
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
